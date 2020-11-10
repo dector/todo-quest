@@ -1,0 +1,300 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ToDo Server API",
+    "description": "Simple ToDo service API for Jet ToDo Quest.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3030/api",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/tasks": {
+      "get": {
+        "summary": "Returns a list of tasks.",
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "enum": [
+                "all",
+                "done",
+                "undone"
+              ],
+              "type": "string",
+              "example": "undone",
+              "default": "all"
+            },
+            "description": "Filter by task status"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Task"
+                  }
+                },
+                "examples": {
+                  "No tasks": {
+                    "value": []
+                  },
+                  "Mixed tasks": {
+                    "value": [
+                      {
+                        "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
+                        "title": "Read about Kotlin",
+                        "isDone": true,
+                        "createdAt": "2020-11-10T12:00:00Z"
+                      },
+                      {
+                        "id": "e57c98ef-0216-44cd-b987-29605699e024",
+                        "title": "Create API server",
+                        "isDone": false,
+                        "createdAt": "2020-11-10T14:18:00Z"
+                      },
+                      {
+                        "id": "1582a42f-d9a4-4547-ad34-72e8b08bfa82",
+                        "title": "Create UI client",
+                        "isDone": false,
+                        "createdAt": "2020-11-10T14:20:00Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Fetch stored tasks.",
+        "operationId": "fetch-tasks"
+      },
+      "parameters": [],
+      "post": {
+        "summary": "",
+        "operationId": "create-task",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                },
+                "examples": {
+                  "Task created": {
+                    "value": {
+                      "id": "8e5f48a0-e7de-4a0e-a787-304f11696c84",
+                      "title": "Read about Ktor",
+                      "isDone": false,
+                      "createdAt": "2020-11-10T12:00:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Create new task.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title"
+                ]
+              },
+              "examples": {
+                "Create new task": {
+                  "value": {
+                    "title": "Read about Ktor"
+                  }
+                }
+              }
+            }
+          },
+          "description": "New task description"
+        }
+      }
+    },
+    "/task/{uuid}": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Task doesn't exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "errors"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "operationId": "get-task-by-uuid",
+        "description": "Fetch single task",
+        "parameters": []
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": "uuid",
+          "in": "path",
+          "required": true,
+          "description": "Task UUID"
+        }
+      ],
+      "patch": {
+        "summary": "",
+        "operationId": "change-task-status",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                },
+                "examples": {
+                  "Task status changed": {
+                    "value": {
+                      "id": "4713e273-6fac-4ecc-b0c5-52230d866764",
+                      "title": "Read about Ktor",
+                      "isDone": true,
+                      "createdAt": "2019-08-24T14:15:22Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Task doesn't exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "uniqueItems": true,
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "errors"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "description": "Change task execution status",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "isDone": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "isDone"
+                ]
+              }
+            }
+          },
+          "description": "Set task status"
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Task": {
+        "title": "Task",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "isDone": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "isDone",
+          "createdAt"
+        ]
+      }
+    }
+  }
+}
