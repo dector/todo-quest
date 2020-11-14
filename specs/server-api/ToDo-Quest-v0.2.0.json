@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "title": "ToDo Server API",
-    "description": "Simple ToDo service API for Jet ToDo Quest.",
-    "version": "1.0.0"
+    "description": "Simple ToDo service API for `Kotlin ToDo-Quest`",
+    "version": "0.2.0"
   },
   "servers": [
     {
@@ -13,8 +13,12 @@
   ],
   "paths": {
     "/tasks": {
+      "parameters": [],
       "get": {
-        "summary": "Returns a list of tasks.",
+        "summary": "Fetch all stored tasks",
+        "tags": [
+          "tasks"
+        ],
         "parameters": [
           {
             "name": "filter",
@@ -26,7 +30,6 @@
                 "undone"
               ],
               "type": "string",
-              "example": "undone",
               "default": "all"
             },
             "description": "Filter by task status"
@@ -45,10 +48,7 @@
                   }
                 },
                 "examples": {
-                  "No tasks": {
-                    "value": []
-                  },
-                  "Mixed tasks": {
+                  "All tasks": {
                     "value": [
                       {
                         "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
@@ -69,22 +69,43 @@
                         "createdAt": "2020-11-10T14:20:00Z"
                       }
                     ]
+                  },
+                  "No tasks": {
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request parameter `filter` is not correct",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Incorrect filter": {
+                    "value": {
+                      "errors": "'filter' was 'everything' but only one of ['all', 'done', 'undone'] are allowed"
+                    }
                   }
                 }
               }
             }
           },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Server internal error"
           }
         },
-        "description": "Fetch stored tasks.",
+        "description": "Retrieve all tasks stored on server",
         "operationId": "fetch-tasks"
       },
-      "parameters": [],
       "post": {
-        "summary": "",
-        "operationId": "create-task",
+        "summary": "Create new task",
+        "tags": [
+          "tasks"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -106,11 +127,37 @@
               }
             }
           },
+          "400": {
+            "description": "Request body is not JSON or `title` is missing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Not a JSON": {
+                    "value": {
+                      "errors": [
+                        "request is not a JSON object"
+                      ]
+                    }
+                  },
+                  "No title": {
+                    "value": {
+                      "errors": [
+                        "'title' is missing in request"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
           "500": {
-            "description": "Internal Server Error"
+            "description": "Server internal error"
           }
         },
-        "description": "Create new task.",
+        "description": "Create new task with specified title",
         "requestBody": {
           "content": {
             "application/json": {
@@ -139,50 +186,6 @@
       }
     },
     "/task/{uuid}": {
-      "get": {
-        "summary": "Your GET endpoint",
-        "tags": [],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Task"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Task doesn't exist",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "errors": {
-                      "type": "array",
-                      "uniqueItems": true,
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "required": [
-                    "errors"
-                  ]
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "operationId": "get-task-by-uuid",
-        "description": "Fetch single task",
-        "parameters": []
-      },
       "parameters": [
         {
           "schema": {
@@ -196,8 +199,10 @@
         }
       ],
       "patch": {
-        "summary": "",
-        "operationId": "change-task-status",
+        "summary": "Change task status",
+        "tags": [
+          "task"
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -220,23 +225,41 @@
             }
           },
           "400": {
-            "description": "Task doesn't exist",
+            "description": "Task with current uuid doesn't exist, request body is not JSON or `isDone` is not provided / not a boolean",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "errors": {
-                      "type": "array",
-                      "uniqueItems": true,
-                      "items": {
-                        "type": "string"
-                      }
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Task does not exists": {
+                    "value": {
+                      "errors": [
+                        "task with uuid '7352a88d-cf84-4173-8294-f2f1d838bf37' does not exist"
+                      ]
                     }
                   },
-                  "required": [
-                    "errors"
-                  ]
+                  "Not a JSON": {
+                    "value": {
+                      "errors": [
+                        "request is not a JSON object"
+                      ]
+                    }
+                  },
+                  "Missing `isDone`": {
+                    "value": {
+                      "errors": [
+                        "'isDone' is missing in request"
+                      ]
+                    }
+                  },
+                  "Incorrect `isDone`": {
+                    "value": {
+                      "errors": [
+                        "'isDone' is not a boolean value: 'maybe'"
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -245,7 +268,7 @@
             "description": "Internal Server Error"
           }
         },
-        "description": "Change task execution status",
+        "description": "Mark task as `done`/`undone`",
         "requestBody": {
           "content": {
             "application/json": {
@@ -267,6 +290,16 @@
       }
     }
   },
+  "tags": [
+    {
+      "name": "tasks",
+      "description": "All tasks"
+    },
+    {
+      "name": "task",
+      "description": "Single task"
+    }
+  ],
   "components": {
     "schemas": {
       "Task": {
@@ -293,6 +326,20 @@
           "title",
           "isDone",
           "createdAt"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "errors"
         ]
       }
     }
