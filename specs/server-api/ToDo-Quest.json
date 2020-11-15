@@ -3,7 +3,7 @@
   "info": {
     "title": "ToDo Server API",
     "description": "Simple ToDo service API for `Kotlin ToDo-Quest`",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "servers": [
     {
@@ -225,24 +225,24 @@
             }
           },
           "400": {
-            "description": "Task with current uuid doesn't exist, request body is not JSON or `isDone` is not provided / not a boolean",
+            "description": "request body is not JSON, task `uuid` is not a valid `UUID` or `isDone` is not provided / not a boolean",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "examples": {
-                  "Task does not exists": {
-                    "value": {
-                      "errors": [
-                        "task with uuid '7352a88d-cf84-4173-8294-f2f1d838bf37' does not exist"
-                      ]
-                    }
-                  },
                   "Not a JSON": {
                     "value": {
                       "errors": [
                         "request is not a JSON object"
+                      ]
+                    }
+                  },
+                  "Invalid UUID": {
+                    "value": {
+                      "errors": [
+                        "'wawaweewa' is not a valid uuid"
                       ]
                     }
                   },
@@ -257,6 +257,25 @@
                     "value": {
                       "errors": [
                         "'isDone' is not a boolean value: 'maybe'"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task with current uuid doesn't exist",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "Task does not exists": {
+                    "value": {
+                      "errors": [
+                        "task with uuid '7352a88d-cf84-4173-8294-f2f1d838bf37' does not exist"
                       ]
                     }
                   }
